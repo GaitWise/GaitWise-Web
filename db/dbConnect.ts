@@ -1,3 +1,5 @@
+/* eslint-disable no-var */
+// db\dbConnect.ts
 import mongoose from 'mongoose'
 
 declare global {
