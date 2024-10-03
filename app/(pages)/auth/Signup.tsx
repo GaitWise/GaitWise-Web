@@ -4,26 +4,33 @@ import { Gaitwise } from '@/public/svg'
 import Image from 'next/image'
 import { useState } from 'react'
 import styled from 'styled-components'
+import axios from 'axios'
+import { useRouter } from 'next/navigation'
 
 export default function SignUp() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('analyst')
+  const [errorMessage, setErrorMessage] = useState('') // エラーメッセージの追加
+
+  const router = useRouter()
 
   const handleSignUp = async () => {
-    const res = await fetch('/api/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name, email, password, role }),
-    })
-
-    if (res.ok) {
-      alert('アカウント作成成功')
-    } else {
-      alert('アカウント作成失敗')
+    setErrorMessage('') // エラーメッセージのリセット
+    try {
+      const res = await axios.post('/api/auth/signup', { name, email, password, role })
+      // status による反応を分ける
+      if (res.status === 200) {
+        alert('アカウント作成成功')
+        router.push('/auth?type=login')
+      } else if (res.status === 203) {
+        setErrorMessage(res.data.message || 'このメールアドレスは既に使用されています')
+      } else if (res.status === 500) {
+        setErrorMessage(res.data.message || 'サインアップ失敗')
+      }
+    } catch {
+      setErrorMessage('サーバーエラーが発生しました')
     }
   }
 
@@ -32,7 +39,6 @@ export default function SignUp() {
       <Image src={Gaitwise} alt="logo" width={100} height={100} layout="responsive" />
       <Title>Create Account</Title>
       <Subtitle>Doctor must authenticate after Login</Subtitle>
-
       <RoleSelect>
         <label>
           <input
@@ -55,7 +61,6 @@ export default function SignUp() {
           Doctor
         </label>
       </RoleSelect>
-
       <InputField type="text" placeholder="Your Name" value={name} onChange={(e) => setName(e.target.value)} />
       <InputField type="email" placeholder="Your Email" value={email} onChange={(e) => setEmail(e.target.value)} />
       <InputField
@@ -64,11 +69,14 @@ export default function SignUp() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-
-      <SignUpButton onClick={handleSignUp}>Sign Up</SignUpButton>
-
+      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>} {/* エラーメッセージを表示 */}
+      <SignUpButton onClick={handleSignUp} disabled={!name.trim() || !email.trim() || !password.trim()}>
+        Sign Up
+      </SignUpButton>
       <Links>
-        <a href="/auth?type=login">Already have an account? Sign In</a>
+        <p>
+          Already have an account?<a href="/auth?type=login"> Sign In</a>
+        </p>
       </Links>
     </SignUpBox>
   )
@@ -127,6 +135,16 @@ const SignUpButton = styled.button`
   &:hover {
     background-color: #1a202c;
   }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+`
+
+const ErrorMessage = styled.p`
+  color: red;
+  margin-bottom: 1rem;
 `
 
 const Links = styled.div`

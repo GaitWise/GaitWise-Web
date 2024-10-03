@@ -4,23 +4,26 @@ import styled from 'styled-components'
 import axios from 'axios'
 import { User } from '@/types/user'
 
+import useAuth from '@/app/utils/useAuth'
+
 export default function Page() {
-  const [nickname, setNickname] = useState('') // 닉네임 상태
+  const [name, setNickname] = useState('') // 닉네임 상태
   const [result, setResult] = useState('') // 결과 메시지 상태
   const [userData, setUserData] = useState<User | null>(null) // 가져온 사용자 데이터
-
+  const loginUser = useAuth()
   // API 호출 함수
   const checkNickname = async () => {
-    if (!nickname) {
+    if (!name) {
       setResult('닉네임을 입력해주세요.')
       setUserData(null) // 사용자 데이터 초기화
       return
     }
 
     try {
-      const res = await axios.get(`/api/test?nickname=${nickname}`)
+      const res = await axios.get(`/api/auth/all?name=${name}`)
 
       const data = res.data
+      console.log('data', data.user)
       if (res.status === 200) {
         setResult(data.message) // API로부터의 메시지 설정
         setUserData(data.user || null) // user 데이터가 존재하면 설정
@@ -37,20 +40,22 @@ export default function Page() {
   return (
     <Container>
       <Title>닉네임 중복 확인</Title>
-      <Input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="닉네임을 입력" />
+      <Input type="text" value={name} onChange={(e) => setNickname(e.target.value)} placeholder="닉네임을 입력" />
       <Button onClick={checkNickname}>확인</Button>
       {result && <Result>{result}</Result>}
-
+      <div>
+        <h1>auth test</h1>
+        <p>ユーザー名：{loginUser.username && loginUser.username}</p>
+        <p>メールアドレス：{loginUser.email && loginUser.email}</p>
+        <p>ログイン状態：{loginUser.email ? 'ログイン中' : 'ログアウト中'}</p>
+      </div>
       {/* 사용자 데이터가 있을 때 표시 */}
       {userData && (
         <UserDataContainer>
           <h2>사용자 데이터</h2>
           <UserDataField>이메일: {userData.email}</UserDataField>
-          <UserDataField>닉네임: {userData.nickname}</UserDataField>
-          <UserDataField>프로필 이미지 URL: {userData.profile_image_url}</UserDataField>
-          <UserDataField>사용자 유형: {userData.user_type}</UserDataField>
-          <UserDataField>생성 날짜: {new Date(userData.createdAt).toLocaleString()}</UserDataField>
-          <UserDataField>업데이트 날짜: {new Date(userData.updatedAt).toLocaleString()}</UserDataField>
+          <UserDataField>Name: {userData.name}</UserDataField>
+          <UserDataField>Password: {userData.password}</UserDataField>
         </UserDataContainer>
       )}
     </Container>

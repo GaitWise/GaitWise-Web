@@ -6,28 +6,39 @@ import SignUp from './Signup'
 import ForgetPassword from './ForgetPass'
 import { Gaitwise } from '@/public/svg'
 import Image from 'next/image'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation' // useRouterをインポート
+import axios from 'axios' // axiosのインポート
 
 function AuthContent() {
   const searchParams = useSearchParams() // URLのクエリパラメータを取得
   const type = searchParams.get('type') // 'type' クエリパラメータを取得
+  const router = useRouter() // useRouterフックを使用
 
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('analyst')
 
   const handleLogin = async () => {
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password, role }),
-    })
+    try {
+      const res = await axios.post('/api/auth/singin', {
+        email,
+        password,
+        role,
+      })
 
-    if (res.ok) {
-      alert('ログイン成功')
-    } else {
+      const jsondata = res.data
+      if (jsondata.flg) {
+        // 成功したら、トークンを保存
+        if ('token' in jsondata) {
+          localStorage.setItem('token', jsondata.token)
+          alert(jsondata.message)
+          // ログイン成功時に'/test'ページにリダイレクト
+          router.push('/test')
+        }
+      } else {
+        alert(jsondata.message)
+      }
+    } catch {
       alert('ログイン失敗')
     }
   }
@@ -63,12 +74,7 @@ function AuthContent() {
             </label>
           </RoleSelect>
 
-          <InputField
-            type="email"
-            placeholder="Your Email"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+          <InputField type="email" placeholder="Your Email" value={email} onChange={(e) => setEmail(e.target.value)} />
           <InputField
             type="password"
             placeholder="Password"
@@ -76,7 +82,9 @@ function AuthContent() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          <LoginButton onClick={handleLogin}>Sign In</LoginButton>
+          <LoginButton onClick={handleLogin} disabled={!email.trim() || !password.trim()}>
+            Sign In
+          </LoginButton>
 
           <Links>
             <a href="/auth?type=forgetpass">Forgot password?</a>
@@ -162,6 +170,11 @@ const LoginButton = styled.button`
 
   &:hover {
     background-color: #1a202c;
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
   }
 `
 

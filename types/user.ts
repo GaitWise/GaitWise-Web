@@ -1,8 +1,7 @@
 export interface User {
   email: string
-  nickname: string
-  profile_image_url: string
-  user_type: string
+  name: string
+  password: string
   createdAt: Date
   updatedAt: Date
 }
