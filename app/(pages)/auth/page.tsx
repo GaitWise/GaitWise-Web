@@ -6,14 +6,14 @@ import SignUp from './Signup'
 import ForgetPassword from './ForgetPass'
 import { Gaitwise } from '@/public/svg'
 import Image from 'next/image'
-import { useSearchParams, useRouter } from 'next/navigation' // useRouterをインポート
-import axios from 'axios' // axiosのインポート
-import Cookies from 'js-cookie' // js-cookieのインポート
+import { useSearchParams, useRouter } from 'next/navigation' // useRouter를 임포트
+import axios from 'axios' // axios를 임포트
+import Cookies from 'js-cookie' // js-cookie를 임포트
 
 function AuthContent() {
-  const searchParams = useSearchParams() // URLのクエリパラメータを取得
-  const type = searchParams.get('type') // 'type' クエリパラメータを取得
-  const router = useRouter() // useRouterフックを使用
+  const searchParams = useSearchParams() // URL의 쿼리 파라미터를 가져옴
+  const type = searchParams.get('type') // 'type' 쿼리 파라미터를 가져옴
+  const router = useRouter() // useRouter 훅을 사용
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -29,19 +29,19 @@ function AuthContent() {
 
       const jsondata = res.data
       if (jsondata.flg) {
-        // 成功したら、トークンをクッキーに保存
+        // 성공하면, 토큰을 쿠키에 저장
         if ('token' in jsondata) {
-          // クッキーにトークンを保存
+          // 쿠키에 토큰을 저장
           Cookies.set('token', jsondata.token, {
-            expires: 1, // 1日後に有効期限切れ
-            secure: true, // HTTPS接続でのみ送信される
-            sameSite: 'Strict', // 同じサイト間でのみクッキーが送信される
+            expires: 1, // 1일 후에 만료
+            secure: true, // HTTPS 연결에서만 전송됨
+            sameSite: 'Strict', // 동일 사이트 간에만 쿠키가 전송됨
           })
 
-          // 成功メッセージの表示
+          // 성공 메시지 표시
           alert(jsondata.message)
 
-          // ログイン後のページにリダイレクト（例: '/test'）
+          // 로그인 후 페이지로 리다이렉트 (예: '/test')
           router.push('/test')
         }
       } else {
@@ -50,7 +50,7 @@ function AuthContent() {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       console.error(errorMessage)
-      alert('ログイン失敗')
+      alert('로그인 실패')
     }
   }
 
