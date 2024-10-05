@@ -9,38 +9,38 @@ import { useRouter } from 'next/navigation'
 
 export default function ForgetPassword() {
   const [email, setEmail] = useState('')
-  const [verificationCode, setVerificationCode] = useState('') // 認証コード入力用
-  const [isCodeSent, setIsCodeSent] = useState<'unsent' | 'sent' | 'resend'>('unsent') // 3つのステートを持たせる
-  const [loading, setLoading] = useState(false) // ローディング状態管理
+  const [verificationCode, setVerificationCode] = useState('') // 인증 코드 입력용
+  const [isCodeSent, setIsCodeSent] = useState<'unsent' | 'sent' | 'resend'>('unsent') // 3가지 상태를 가짐
+  const [loading, setLoading] = useState(false) // 로딩 상태 관리
 
   const router = useRouter()
 
   const handleSendCode = async () => {
-    setLoading(true) // ローディングを開始
+    setLoading(true) // 로딩 시작
     try {
-      const response = await axios.post('/api/auth/email', { email }) // axios.post を使用してAPI呼び出し
+      const response = await axios.post('/api/auth/email', { email }) // axios.post를 사용하여 API 호출
 
       if (response.status === 200) {
-        setIsCodeSent('sent') // コードが送信されたら、認証状態に変更
-        alert('確認コードが送信されました')
+        setIsCodeSent('sent') // 코드가 전송되면 인증 상태로 변경
+        alert('확인 코드가 전송되었습니다')
       } else if (response.status === 203) {
-        alert('このユーザーは存在しません')
+        alert('이 사용자는 존재하지 않습니다')
       } else {
-        alert(`エラー: ${response.data.message}`)
+        alert(`오류: ${response.data.message}`)
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response) {
-        alert(`エラー: ${error.response.data.message || 'コードの送信に失敗しました'}`)
+        alert(`오류: ${error.response.data.message || '코드 전송에 실패했습니다'}`)
       } else {
-        alert('コードの送信に失敗しました')
+        alert('코드 전송에 실패했습니다')
       }
     } finally {
-      setLoading(false) // ローディング終了
+      setLoading(false) // 로딩 종료
     }
   }
 
   const handleVerifyCode = async () => {
-    setLoading(true) // ローディングを開始
+    setLoading(true) // 로딩 시작
     try {
       const response = await axios.post('/api/auth/verify-code', {
         email,
@@ -48,21 +48,21 @@ export default function ForgetPassword() {
       })
 
       if (response.status === 200) {
-        alert('認証成功')
-        // パスワードリセット画面にリダイレクト
+        alert('인증 성공')
+        // 비밀번호 재설정 화면으로 리다이렉트
         router.push(`/auth/reset-pass?email=${email}`)
       } else if (response.status === 203) {
-        alert('無効なコードです')
-        setIsCodeSent('resend') // 認証失敗時に再送信モードに変更
+        alert('유효하지 않은 코드입니다')
+        setIsCodeSent('resend') // 인증 실패 시 재전송 모드로 변경
       } else if (response.status === 201) {
-        alert('コードが一致しません')
-        setIsCodeSent('resend') // 認証失敗時に再送信モードに変更
+        alert('코드가 일치하지 않습니다')
+        setIsCodeSent('resend') // 인증 실패 시 재전송 모드로 변경
       }
     } catch (error) {
       console.error(error)
-      alert('エラーが発生しました')
+      alert('오류가 발생했습니다')
     } finally {
-      setLoading(false) // ローディング終了
+      setLoading(false) // 로딩 종료
     }
   }
 
@@ -79,7 +79,7 @@ export default function ForgetPassword() {
       {(isCodeSent === 'sent' || isCodeSent === 'resend') && (
         <InputField
           type="text"
-          placeholder="確認コードを入力"
+          placeholder="확인 코드를 입력"
           value={verificationCode}
           onChange={(e) => setVerificationCode(e.target.value)}
         />
@@ -93,13 +93,13 @@ export default function ForgetPassword() {
 
       {isCodeSent === 'sent' && (
         <SendCodeButton onClick={handleVerifyCode} disabled={!verificationCode.trim() || loading}>
-          {loading ? 'Loading...' : '認証'}
+          {loading ? 'Loading...' : '인증'}
         </SendCodeButton>
       )}
 
       {isCodeSent === 'resend' && (
         <SendCodeButton onClick={handleSendCode} disabled={loading}>
-          {loading ? 'Loading...' : '再送信'}
+          {loading ? 'Loading...' : '재전송'}
         </SendCodeButton>
       )}
       <Links>

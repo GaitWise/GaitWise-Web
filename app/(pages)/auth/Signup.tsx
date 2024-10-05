@@ -12,25 +12,25 @@ export default function SignUp() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('analyst')
-  const [errorMessage, setErrorMessage] = useState('') // エラーメッセージの追加
+  const [errorMessage, setErrorMessage] = useState('') // 에러 메시지 추가
 
   const router = useRouter()
 
   const handleSignUp = async () => {
-    setErrorMessage('') // エラーメッセージのリセット
+    setErrorMessage('') // 에러 메시지 리셋
     try {
       const res = await axios.post('/api/auth/signup', { name, email, password, role })
-      // status による反応を分ける
+      // status에 따른 반응 분리
       if (res.status === 200) {
-        alert('アカウント作成成功')
+        alert('계정 생성 성공')
         router.push('/auth?type=login')
       } else if (res.status === 203) {
-        setErrorMessage(res.data.message || 'このメールアドレスは既に使用されています')
+        setErrorMessage(res.data.message || '이 이메일 주소는 이미 사용 중입니다')
       } else if (res.status === 500) {
-        setErrorMessage(res.data.message || 'サインアップ失敗')
+        setErrorMessage(res.data.message || '회원가입 실패')
       }
     } catch {
-      setErrorMessage('サーバーエラーが発生しました')
+      setErrorMessage('서버 오류가 발생했습니다')
     }
   }
 
@@ -69,7 +69,7 @@ export default function SignUp() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>} {/* エラーメッセージを表示 */}
+      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>} {/* 에러 메시지 표시 */}
       <SignUpButton onClick={handleSignUp} disabled={!name.trim() || !email.trim() || !password.trim()}>
         Sign Up
       </SignUpButton>

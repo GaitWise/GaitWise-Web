@@ -44,10 +44,10 @@ export default function Page() {
       <Button onClick={checkNickname}>확인</Button>
       {result && <Result>{result}</Result>}
       <div>
-        <h1>auth test</h1>
-        <p>ユーザー名：{loginUser.username && loginUser.username}</p>
-        <p>メールアドレス：{loginUser.email && loginUser.email}</p>
-        <p>ログイン状態：{loginUser.email ? 'ログイン中' : 'ログアウト中'}</p>
+        <h1>인증 테스트</h1>
+        <p>사용자 이름：{loginUser.username && loginUser.username}</p>
+        <p>이메일 주소：{loginUser.email && loginUser.email}</p>
+        <p>로그인 상태：{loginUser.email ? '로그인 중' : '로그아웃 중'}</p>
       </div>
       {/* 사용자 데이터가 있을 때 표시 */}
       {userData && (

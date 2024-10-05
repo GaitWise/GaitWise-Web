@@ -4,7 +4,7 @@ const verificationCodeSchema = new mongoose.Schema(
   {
     email: { type: String, required: true },
     code: { type: String, required: true },
-    expiresAt: { type: Date, required: true }, // 有効期限
+    expiresAt: { type: Date, required: true }, // 유효기간
   },
   {
     timestamps: true,
