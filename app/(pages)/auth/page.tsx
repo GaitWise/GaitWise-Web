@@ -8,6 +8,7 @@ import { Gaitwise } from '@/public/svg'
 import Image from 'next/image'
 import { useSearchParams, useRouter } from 'next/navigation' // useRouterをインポート
 import axios from 'axios' // axiosのインポート
+import Cookies from 'js-cookie' // js-cookieのインポート
 
 function AuthContent() {
   const searchParams = useSearchParams() // URLのクエリパラメータを取得
@@ -28,17 +29,27 @@ function AuthContent() {
 
       const jsondata = res.data
       if (jsondata.flg) {
-        // 成功したら、トークンを保存
+        // 成功したら、トークンをクッキーに保存
         if ('token' in jsondata) {
-          localStorage.setItem('token', jsondata.token)
+          // クッキーにトークンを保存
+          Cookies.set('token', jsondata.token, {
+            expires: 1, // 1日後に有効期限切れ
+            secure: true, // HTTPS接続でのみ送信される
+            sameSite: 'Strict', // 同じサイト間でのみクッキーが送信される
+          })
+
+          // 成功メッセージの表示
           alert(jsondata.message)
-          // ログイン成功時に'/test'ページにリダイレクト
+
+          // ログイン後のページにリダイレクト（例: '/test'）
           router.push('/test')
         }
       } else {
         alert(jsondata.message)
       }
-    } catch {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      console.error(errorMessage)
       alert('ログイン失敗')
     }
   }
